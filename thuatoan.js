@@ -1,409 +1,318 @@
-// ===========================================
-// CAESAR CIPHER IMPLEMENTATION
-// ===========================================
-class CaesarCipher {
-    static encrypt(text, shift) {
-        const steps = [];
-        let result = '';
-        shift = parseInt(shift) || 0;
-        
-        steps.push(`Bước 1: Chuyển đổi shift = ${shift} về dạng chuẩn (0-25)`);
-        shift = ((shift % 26) + 26) % 26;
-        steps.push(`Shift chuẩn hóa: ${shift}`);
-        
-        steps.push(`Bước 2: Xử lý từng ký tự:`);
-        
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const charCode = char.charCodeAt(0);
-            
-            if (charCode >= 65 && charCode <= 90) { // A-Z
-                const shifted = ((charCode - 65 + shift) % 26) + 65;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' (${charCode}) → '${newChar}' (${shifted})`);
-            } else if (charCode >= 97 && charCode <= 122) { // a-z
-                const shifted = ((charCode - 97 + shift) % 26) + 97;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' (${charCode}) → '${newChar}' (${shifted})`);
-            } else {
-                result += char;
-                steps.push(`  '${char}' → '${char}' (không thay đổi)`);
-            }
-        }
-        
-        return { result, steps };
-    }
-    
-    static decrypt(text, shift) {
-        return this.encrypt(text, -shift);
-    }
+
+/*
+============================
+HƯỚNG DẪN THỰC HÀNH MÃ HOÁ AN TOÀN THÔNG TIN - 3 NHÓM CHÍNH
+============================
+
+File này dành cho việc học và thực hành 3 nhóm thuật toán mã hoá cơ bản:
+1. MÃ HOÁ ĐỐI XỨNG (Symmetric Cryptography)
+2. MÃ HOÁ BẤT ĐỐI XỨNG (Asymmetric Cryptography) 
+3. HÀM BĂM MỘT CHIỀU (Hash Functions)
+
+================================================================================
+NHÓM 1: MÃ HOÁ ĐỐI XỨNG (SYMMETRIC CRYPTOGRAPHY)
+================================================================================
+
+🔍 KHÁI NIỆM CHUNG:
+Mã hóa đối xứng sử dụng cùng một khóa (secret key) cho cả quá trình mã hóa và giải mã.
+Người gửi và người nhận phải chia sẻ khóa bí mật trước khi trao đổi thông tin.
+
+🎯 ĐặC ĐIỂM:
+✅ Ưu điểm:
+- Tốc độ xử lý nhanh
+- Phù hợp với dữ liệu lớn  
+- Độ bảo mật cao khi khóa được bảo vệ tốt
+- Ít tốn tài nguyên tính toán
+
+❌ Nhược điểm:
+- Vấn đề phân phối khóa (Key Distribution Problem)
+- Số lượng khóa tăng theo cấp số nhân (n người cần n*(n-1)/2 khóa)
+- Không cung cấp tính toàn vẹn và xác thực
+
+�️ CÁC THUẬT TOÁN PHỔ BIẾN:
+
+A. THUẬT TOÁN CỔ ĐIỂN (Classical Ciphers):
+   - Caesar Cipher (dịch chuyển đơn giản)
+   - Vigenère Cipher (khóa chu kỳ)
+   - Playfair Cipher (ma trận 5×5)
+   - Rail Fence Cipher (sắp xếp zigzag)
+
+B. THUẬT TOÁN HIỆN ĐẠI (Modern Ciphers):
+   - DES (Data Encryption Standard) - 56-bit, đã lỗi thời
+   - 3DES (Triple DES) - áp dụng DES 3 lần
+   - AES (Advanced Encryption Standard) - chuẩn hiện tại
+   - Blowfish, Twofish - thuật toán thay thế
+   - ChaCha20, Salsa20 - stream ciphers hiện đại
+
+🧪 BÀI TẬP THỰC HÀNH:
+
+Bước 1: Triển khai Caesar Cipher cơ bản
+function symmetricCaesar(text, key, encrypt = true) {
+    // TODO: Cài đặt thuật toán Caesar
+    // - Xử lý cả mã hóa và giải mã
+    // - Hỗ trợ key âm/dương
+    // - Xử lý cả chữ hoa/thường
 }
 
-// ===========================================
-// VIGENÈRE CIPHER IMPLEMENTATION
-// ===========================================
-class VigenereCipher {
-    static encrypt(text, key) {
-        const steps = [];
-        let result = '';
-        key = key.toUpperCase().replace(/[^A-Z]/g, '');
-        
-        if (!key) {
-            return { result: 'Lỗi: Khóa không hợp lệ', steps: ['Khóa phải chứa ít nhất một chữ cái'] };
-        }
-        
-        steps.push(`Bước 1: Chuẩn hóa khóa: "${key}"`);
-        steps.push(`Bước 2: Mở rộng khóa theo độ dài văn bản:`);
-        
-        let keyIndex = 0;
-        let extendedKey = '';
-        
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (/[A-Za-z]/.test(char)) {
-                extendedKey += key[keyIndex % key.length];
-                keyIndex++;
-            } else {
-                extendedKey += ' ';
-            }
-        }
-        
-        steps.push(`Khóa mở rộng: "${extendedKey}"`);
-        steps.push(`Bước 3: Mã hóa từng ký tự:`);
-        
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const charCode = char.charCodeAt(0);
-            
-            if (charCode >= 65 && charCode <= 90) { // A-Z
-                const keyChar = extendedKey[i];
-                const shift = keyChar.charCodeAt(0) - 65;
-                const shifted = ((charCode - 65 + shift) % 26) + 65;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' + '${keyChar}'(${shift}) → '${newChar}'`);
-            } else if (charCode >= 97 && charCode <= 122) { // a-z
-                const keyChar = extendedKey[i];
-                const shift = keyChar.charCodeAt(0) - 65;
-                const shifted = ((charCode - 97 + shift) % 26) + 97;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' + '${keyChar}'(${shift}) → '${newChar}'`);
-            } else {
-                result += char;
-                steps.push(`  '${char}' → '${char}' (không thay đổi)`);
-            }
-        }
-        
-        return { result, steps };
-    }
-    
-    static decrypt(text, key) {
-        const steps = [];
-        let result = '';
-        key = key.toUpperCase().replace(/[^A-Z]/g, '');
-        
-        if (!key) {
-            return { result: 'Lỗi: Khóa không hợp lệ', steps: ['Khóa phải chứa ít nhất một chữ cái'] };
-        }
-        
-        steps.push(`Bước 1: Chuẩn hóa khóa: "${key}"`);
-        steps.push(`Bước 2: Giải mã bằng cách trừ khóa:`);
-        
-        let keyIndex = 0;
-        
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const charCode = char.charCodeAt(0);
-            
-            if (charCode >= 65 && charCode <= 90) { // A-Z
-                const keyChar = key[keyIndex % key.length];
-                const shift = keyChar.charCodeAt(0) - 65;
-                const shifted = ((charCode - 65 - shift + 26) % 26) + 65;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' - '${keyChar}'(${shift}) → '${newChar}'`);
-                keyIndex++;
-            } else if (charCode >= 97 && charCode <= 122) { // a-z
-                const keyChar = key[keyIndex % key.length];
-                const shift = keyChar.charCodeAt(0) - 65;
-                const shifted = ((charCode - 97 - shift + 26) % 26) + 97;
-                const newChar = String.fromCharCode(shifted);
-                result += newChar;
-                steps.push(`  '${char}' - '${keyChar}'(${shift}) → '${newChar}'`);
-                keyIndex++;
-            } else {
-                result += char;
-                steps.push(`  '${char}' → '${char}' (không thay đổi)`);
-            }
-        }
-        
-        return { result, steps };
-    }
+Bước 2: Triển khai Vigenère Cipher
+function symmetricVigenere(text, keyword, encrypt = true) {
+    // TODO: Cài đặt thuật toán Vigenère
+    // - Mở rộng keyword theo độ dài text
+    // - Áp dụng công thức (char ± keyChar) % 26
 }
 
-// ===========================================
-// PLAYFAIR CIPHER IMPLEMENTATION
-// ===========================================
-class PlayfairCipher {
-    static createMatrix(key) {
-        const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'; // J được thay bằng I
-        const matrix = [];
-        const used = new Set();
-        let matrixStr = '';
-        
-        // Thêm key vào matrix
-        for (let char of key.toUpperCase()) {
-            if (char === 'J') char = 'I';
-            if (/[A-Z]/.test(char) && !used.has(char)) {
-                matrixStr += char;
-                used.add(char);
-            }
-        }
-        
-        // Thêm các chữ cái còn lại
-        for (let char of alphabet) {
-            if (!used.has(char)) {
-                matrixStr += char;
-            }
-        }
-        
-        // Tạo ma trận 5x5
-        for (let i = 0; i < 5; i++) {
-            matrix[i] = [];
-            for (let j = 0; j < 5; j++) {
-                matrix[i][j] = matrixStr[i * 5 + j];
-            }
-        }
-        
-        return matrix;
-    }
-    
-    static findPosition(matrix, char) {
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 5; j++) {
-                if (matrix[i][j] === char) {
-                    return { row: i, col: j };
-                }
-            }
-        }
-        return null;
-    }
-    
-    static prepareText(text) {
-        text = text.toUpperCase().replace(/[^A-Z]/g, '').replace(/J/g, 'I');
-        let prepared = '';
-        
-        for (let i = 0; i < text.length; i += 2) {
-            let first = text[i];
-            let second = text[i + 1] || 'X';
-            
-            if (first === second) {
-                prepared += first + 'X';
-                i--; // Xử lý lại ký tự thứ hai
-            } else {
-                prepared += first + second;
-            }
-        }
-        
-        if (prepared.length % 2 !== 0) {
-            prepared += 'X';
-        }
-        
-        return prepared;
-    }
-    
-    static encrypt(text, key) {
-        const steps = [];
-        const matrix = this.createMatrix(key);
-        const prepared = this.prepareText(text);
-        let result = '';
-        
-        steps.push(`Bước 1: Tạo ma trận Playfair với khóa "${key}":`);
-        steps.push(`Ma trận 5x5:`);
-        for (let row of matrix) {
-            steps.push(`  ${row.join(' ')}`);
-        }
-        
-        steps.push(`Bước 2: Chuẩn bị văn bản: "${text}" → "${prepared}"`);
-        steps.push(`Bước 3: Mã hóa từng cặp ký tự:`);
-        
-        for (let i = 0; i < prepared.length; i += 2) {
-            const first = prepared[i];
-            const second = prepared[i + 1];
-            
-            const pos1 = this.findPosition(matrix, first);
-            const pos2 = this.findPosition(matrix, second);
-            
-            let newFirst, newSecond;
-            
-            if (pos1.row === pos2.row) {
-                // Cùng hàng: dịch phải
-                newFirst = matrix[pos1.row][(pos1.col + 1) % 5];
-                newSecond = matrix[pos2.row][(pos2.col + 1) % 5];
-                steps.push(`  "${first}${second}" (cùng hàng) → "${newFirst}${newSecond}"`);
-            } else if (pos1.col === pos2.col) {
-                // Cùng cột: dịch xuống
-                newFirst = matrix[(pos1.row + 1) % 5][pos1.col];
-                newSecond = matrix[(pos2.row + 1) % 5][pos2.col];
-                steps.push(`  "${first}${second}" (cùng cột) → "${newFirst}${newSecond}"`);
-            } else {
-                // Tạo hình chữ nhật
-                newFirst = matrix[pos1.row][pos2.col];
-                newSecond = matrix[pos2.row][pos1.col];
-                steps.push(`  "${first}${second}" (hình chữ nhật) → "${newFirst}${newSecond}"`);
-            }
-            
-            result += newFirst + newSecond;
-        }
-        
-        return { result, steps };
-    }
-    
-    static decrypt(text, key) {
-        const steps = [];
-        const matrix = this.createMatrix(key);
-        let result = '';
-        
-        steps.push(`Bước 1: Tạo ma trận Playfair với khóa "${key}":`);
-        steps.push(`Ma trận 5x5:`);
-        for (let row of matrix) {
-            steps.push(`  ${row.join(' ')}`);
-        }
-        
-        steps.push(`Bước 2: Giải mã từng cặp ký tự:`);
-        
-        for (let i = 0; i < text.length; i += 2) {
-            const first = text[i];
-            const second = text[i + 1];
-            
-            const pos1 = this.findPosition(matrix, first);
-            const pos2 = this.findPosition(matrix, second);
-            
-            if (!pos1 || !pos2) continue;
-            
-            let newFirst, newSecond;
-            
-            if (pos1.row === pos2.row) {
-                // Cùng hàng: dịch trái
-                newFirst = matrix[pos1.row][(pos1.col - 1 + 5) % 5];
-                newSecond = matrix[pos2.row][(pos2.col - 1 + 5) % 5];
-                steps.push(`  "${first}${second}" (cùng hàng) → "${newFirst}${newSecond}"`);
-            } else if (pos1.col === pos2.col) {
-                // Cùng cột: dịch lên
-                newFirst = matrix[(pos1.row - 1 + 5) % 5][pos1.col];
-                newSecond = matrix[(pos2.row - 1 + 5) % 5][pos2.col];
-                steps.push(`  "${first}${second}" (cùng cột) → "${newFirst}${newSecond}"`);
-            } else {
-                // Tạo hình chữ nhật
-                newFirst = matrix[pos1.row][pos2.col];
-                newSecond = matrix[pos2.row][pos1.col];
-                steps.push(`  "${first}${second}" (hình chữ nhật) → "${newFirst}${newSecond}"`);
-            }
-            
-            result += newFirst + newSecond;
-        }
-        
-        return { result, steps };
-    }
+Bước 3: Mô phỏng AES đơn giản (Educational)
+function simpleAES(data, key) {
+    // TODO: Tạo mô phỏng đơn giản của AES
+    // - SubBytes (thay thế byte)
+    // - ShiftRows (dịch chuyển hàng)  
+    // - MixColumns (trộn cột)
+    // - AddRoundKey (XOR với khóa)
 }
 
-// ===========================================
-// RAIL FENCE CIPHER IMPLEMENTATION
-// ===========================================
-class RailFenceCipher {
-    static encrypt(text, rails) {
-        const steps = [];
-        rails = parseInt(rails) || 3;
-        
-        if (rails < 2) {
-            return { result: 'Lỗi: Số rail phải >= 2', steps: ['Số rail không hợp lệ'] };
-        }
-        
-        const fence = Array(rails).fill().map(() => []);
-        let rail = 0;
-        let direction = 1;
-        
-        steps.push(`Bước 1: Tạo ${rails} rail (hàng rào)`);
-        steps.push(`Bước 2: Đặt từng ký tự vào rail theo hình zíc zắc:`);
-        
-        for (let i = 0; i < text.length; i++) {
-            fence[rail].push(text[i]);
-            steps.push(`  Ký tự '${text[i]}' → Rail ${rail + 1}`);
-            
-            if (rail === 0) {
-                direction = 1;
-            } else if (rail === rails - 1) {
-                direction = -1;
-            }
-            
-            rail += direction;
-        }
-        
-        steps.push(`Bước 3: Đọc theo từng rail:`);
-        let result = '';
-        for (let i = 0; i < rails; i++) {
-            const railContent = fence[i].join('');
-            result += railContent;
-            steps.push(`  Rail ${i + 1}: "${railContent}"`);
-        }
-        
-        return { result, steps };
-    }
-    
-    static decrypt(text, rails) {
-        const steps = [];
-        rails = parseInt(rails) || 3;
-        
-        if (rails < 2) {
-            return { result: 'Lỗi: Số rail phải >= 2', steps: ['Số rail không hợp lệ'] };
-        }
-        
-        // Tạo pattern để xác định vị trí
-        const pattern = Array(rails).fill().map(() => []);
-        let rail = 0;
-        let direction = 1;
-        
-        steps.push(`Bước 1: Tạo pattern để xác định vị trí trong ${rails} rail`);
-        
-        for (let i = 0; i < text.length; i++) {
-            pattern[rail].push(i);
-            
-            if (rail === 0) {
-                direction = 1;
-            } else if (rail === rails - 1) {
-                direction = -1;
-            }
-            
-            rail += direction;
-        }
-        
-        steps.push(`Bước 2: Phân phối ký tự vào từng rail:`);
-        
-        // Điền ký tự vào các rail
-        const fence = Array(rails).fill().map(() => []);
-        let index = 0;
-        
-        for (let i = 0; i < rails; i++) {
-            const railLength = pattern[i].length;
-            const railContent = text.substr(index, railLength);
-            fence[i] = railContent.split('');
-            steps.push(`  Rail ${i + 1}: "${railContent}"`);
-            index += railLength;
-        }
-        
-        steps.push(`Bước 3: Đọc theo pattern zíc zắc:`);
-        
-        // Đọc theo pattern
-        const result = Array(text.length);
-        for (let i = 0; i < rails; i++) {
-            for (let j = 0; j < pattern[i].length; j++) {
-                result[pattern[i][j]] = fence[i][j];
-            }
-        }
-        
-        return { result: result.join(''), steps };
-    }
+Bước 4: Tạo hệ thống quản lý khóa
+function keyManagement() {
+    // TODO: Tạo hệ thống:
+    // - Sinh khóa ngẫu nhiên
+    // - Lưu trữ an toàn
+    // - Chia sẻ khóa an toàn
 }
+
+🔍 KHÁI NIỆM CHUNG:
+Mã hóa bất đối xứng sử dụng cặp khóa: khóa công khai (public key) và khóa bí mật (private key).
+Những gì được mã hóa bằng khóa này chỉ có thể được giải mã bằng khóa kia.
+
+🎯 ĐẶC ĐIỂM:
+✅ Ưu điểm:
+- Giải quyết vấn đề phân phối khóa
+- Cung cấp tính xác thực và chữ ký số
+- Không cần chia sẻ khóa bí mật trước
+- Hỗ trợ non-repudiation (chống chối bỏ)
+
+❌ Nhược điểm:
+- Tốc độ chậm hơn mã hóa đối xứng rất nhiều
+- Yêu cầu tài nguyên tính toán lớn
+- Kích thước khóa phải lớn để đảm bảo an toàn
+- Dễ bị tấn công nếu triển khai sai
+
+🛠️ CÁC THUẬT TOÁN PHỔ BIẾN:
+
+A. RSA (Rivest-Shamir-Adleman):
+   - Dựa trên độ khó của phân tích số nguyên lớn
+   - Kích thước khóa: 1024, 2048, 4096 bit
+   - Ứng dụng: mã hóa, chữ ký số
+
+B. ECC (Elliptic Curve Cryptography):
+   - Dựa trên toán học đường cong elliptic
+   - Kích thước khóa nhỏ hơn RSA nhưng cùng độ an toàn
+   - Ưu điểm: hiệu quả, ít tốn tài nguyên
+
+C. DSA (Digital Signature Algorithm):
+   - Chuyên dùng cho chữ ký số
+   - Không dùng để mã hóa dữ liệu
+
+D. Diffie-Hellman:
+   - Trao đổi khóa an toàn qua kênh không bảo mật
+   - Cơ sở cho nhiều giao thức bảo mật
+
+🧪 BÀI TẬP THỰC HÀNH:
+
+Bước 1: Các hàm toán học cơ bản
+function isPrime(n) {
+    // TODO: Kiểm tra số nguyên tố (Miller-Rabin test)
+}
+
+function gcd(a, b) {
+    // TODO: Tính ước chung lớn nhất (Euclidean algorithm)
+}
+
+function modPow(base, exp, mod) {
+    // TODO: Tính (base^exp) % mod hiệu quả
+}
+
+function extendedGcd(a, b) {
+    // TODO: Thuật toán Extended Euclidean
+    // Trả về {gcd, x, y} sao cho ax + by = gcd(a,b)
+}
+
+Bước 2: Tạo khóa RSA
+function generateRSAKeys(bitLength = 1024) {
+    // TODO: Tạo cặp khóa RSA
+    // 1. Tạo 2 số nguyên tố p, q
+    // 2. Tính n = p * q
+    // 3. Tính φ(n) = (p-1)(q-1)
+    // 4. Chọn e (thường 65537)
+    // 5. Tính d = e^(-1) mod φ(n)
+    // Trả về: {publicKey: {n, e}, privateKey: {n, d}}
+}
+
+Bước 3: Mã hóa/Giải mã RSA
+function rsaEncrypt(message, publicKey) {
+    // TODO: m^e mod n
+}
+
+function rsaDecrypt(ciphertext, privateKey) {
+    // TODO: c^d mod n
+}
+
+Bước 4: Chữ ký số RSA
+function rsaSign(message, privateKey) {
+    // TODO: Tạo chữ ký số
+    // 1. Hash message
+    // 2. Ký hash với private key
+}
+
+function rsaVerify(message, signature, publicKey) {
+    // TODO: Xác minh chữ ký
+    // 1. Hash message
+    // 2. Giải mã signature với public key
+    // 3. So sánh hash
+}
+
+================================================================================
+NHÓM 3: HÀM BĂM MỘT CHIỀU (HASH FUNCTIONS)
+================================================================================
+
+🔍 KHÁI NIỆM CHUNG:
+Hàm băm biến đổi dữ liệu đầu vào (có độ dài bất kỳ) thành một chuỗi có độ dài cố định.
+Đặc điểm quan trọng: quá trình một chiều, không thể đảo ngược.
+
+🎯 ĐẶC ĐIỂM:
+✅ Tính chất cần có:
+- Deterministic: cùng input → cùng output
+- Fast computation: tính toán nhanh
+- Pre-image resistance: khó tìm input từ output  
+- Second pre-image resistance: khó tìm input khác có cùng output
+- Collision resistance: khó tìm 2 input khác nhau có cùng output
+- Avalanche effect: thay đổi nhỏ input → thay đổi lớn output
+
+❌ Các lỗ hổng:
+- Hash collision (va chạm băm)
+- Length extension attacks
+- Rainbow table attacks
+- Birthday attacks
+
+🛠️ CÁC THUẬT TOÁN PHỔ BIẾN:
+
+A. THUẬT TOÁN CŨ (Không nên dùng):
+   - MD5 (128-bit) - có lỗ hổng collision
+   - SHA-1 (160-bit) - không còn an toàn
+
+B. THUẬT TOÁN HIỆN TẠI:
+   - SHA-256, SHA-384, SHA-512 (SHA-2 family)
+   - SHA-3 (Keccak) - thế hệ mới nhất
+   - BLAKE2, BLAKE3 - nhanh và an toàn
+
+C. ỨNG DỤNG ĐẶC BIỆT:
+   - bcrypt, scrypt, Argon2 - hash password
+   - HMAC - xác thực thông điệp
+   - PBKDF2 - tạo khóa từ password
+
+🧪 BÀI TẬP THỰC HÀNH:
+
+Bước 1: Hàm băm đơn giản (Educational)
+function simpleHash(text) {
+    // TODO: Thuật toán djb2 hash
+    // hash = 5381
+    // for each char: hash = ((hash << 5) + hash) + charCode
+}
+
+Bước 2: Sử dụng Web Crypto API
+async function sha256(text) {
+    // TODO: 
+    // 1. Chuyển text thành ArrayBuffer
+    // 2. Dùng crypto.subtle.digest('SHA-256', buffer)
+    // 3. Chuyển kết quả thành hex string
+}
+
+async function sha512(text) {
+    // TODO: Tương tự SHA-256 nhưng dùng 'SHA-512'
+}
+
+Bước 3: HMAC (Hash-based Message Authentication Code)
+async function hmac(message, key, algorithm = 'SHA-256') {
+    // TODO:
+    // 1. Import key với crypto.subtle.importKey()
+    // 2. Dùng crypto.subtle.sign('HMAC', key, message)
+    // 3. Trả về hex string
+}
+
+Bước 4: Password Hashing (bcrypt simulation)
+function hashPassword(password, salt, rounds = 10) {
+    // TODO: Mô phỏng bcrypt
+    // 1. Tạo salt ngẫu nhiên nếu chưa có
+    // 2. Lặp hash password + salt theo rounds
+    // 3. Trả về format: $rounds$salt$hash
+}
+
+function verifyPassword(password, hash) {
+    // TODO: Xác minh password với hash đã lưu
+}
+
+================================================================================
+SO SÁNH VÀ ỨNG DỤNG THỰC TẾ
+================================================================================
+
+🎯 KHI NÀO DÙNG THUẬT TOÁN NÀO:
+
+MÃ HÓA ĐỐI XỨNG:
+✅ Mã hóa dữ liệu lớn (file, database)
+✅ Truyền thông real-time  
+✅ Khi đã có kênh chia sẻ khóa an toàn
+❌ Giao tiếp với người lạ chưa có khóa chung
+
+MÃ HÓA BẤT ĐỐI XỨNG:
+✅ Trao đổi khóa ban đầu
+✅ Chữ ký số, xác thực
+✅ Giao tiếp với người lạ
+❌ Mã hóa dữ liệu lớn (quá chậm)
+
+HÀM BĂM:
+✅ Lưu trữ password
+✅ Kiểm tra tính toàn vẹn dữ liệu
+✅ Proof of work (blockchain)
+✅ Tạo ID duy nhất
+❌ Mã hóa dữ liệu cần giải mã
+
+🎯 HYBRID CRYPTOGRAPHY (Kết hợp):
+1. Dùng bất đối xứng để trao đổi khóa đối xứng
+2. Dùng đối xứng để mã hóa dữ liệu chính
+3. Dùng hash để kiểm tra tính toàn vẹn
+4. Dùng chữ ký số để xác thực
+
+VÍ DỤ: HTTPS/TLS
+- RSA/ECDH: trao đổi khóa
+- AES: mã hóa dữ liệu
+- SHA-256: kiểm tra tính toàn vẹn
+- RSA/ECDSA: chữ ký chứng chỉ
+
+================================================================================
+📚 TÀI LIỆU THAM KHẢO VÀ HƯỚNG DẪN THÊM
+================================================================================
+
+SÁCH:
+1. "Introduction to Modern Cryptography" - Katz & Lindell
+2. "Applied Cryptography" - Bruce Schneier  
+3. "Handbook of Applied Cryptography" - Menezes, Oorschot, Vanstone
+
+CHUẨN QUỐC TẾ:
+1. NIST Special Publications (SP 800 series)
+2. RFC documents (RFC 3447 cho RSA, RFC 6234 cho SHA)
+3. FIPS standards
+
+CÔNG CỤ THỰC HÀNH:
+1. OpenSSL command line
+2. CyberChef (online crypto tools)
+3. Cryptool (educational software)
+
+🚨 LƯU Ý AN TOÀN:
+- Code trong file này CHỈ dành cho mục đích học tập
+- KHÔNG sử dụng trong hệ thống thực tế
+- Luôn dùng thư viện mã hóa đã được kiểm định
+- Cập nhật kiến thức về các lỗ hổng bảo mật mới
+- Hiểu rõ về key management và secure implementation
+
+================================================================================
+HẾT HƯỚNG DẪN - CHÚC BẠN HỌC TẬP HIỆU QUẢ!
+================================================================================
+*/

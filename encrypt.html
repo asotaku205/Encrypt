@@ -3,20 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thị Dịch Vòng</title>
+    <title>Thực Hành An Toàn Thông Tin - 3 Nhóm Thuật Toán Mã Hóa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Hệ Thị Dịch Vòng</h1>
-        
+        <h1> Thực Hành An Toàn Thông Tin</h1>
+
         <div class="algorithm-selector">
-            <label for="algorithm">Thuật toán:</label>
+            <label for="algorithm">Chọn nhóm thuật toán:</label>
             <select id="algorithm" onchange="updateAlgorithm()">
-                <option value="caesar">Caesar Cipher</option>
-                <option value="vigenere">Vigenère Cipher</option>
-                <option value="playfair">Playfair Cipher</option>
-                <option value="rail-fence">Rail Fence Cipher</option>
+                <optgroup label=" MÃ HÓA ĐỐI XỨNG (Symmetric)">
+                    <option value="caesar">Caesar Cipher - Dịch chuyển đơn giản</option>
+                    <option value="vigenere">Vigenère Cipher - Khóa chu kỳ</option>
+                    <option value="playfair">Playfair Cipher - Bảng 5×5</option>
+                    <option value="rail-fence">Rail Fence - Zigzag</option>
+                    <option value="aes-demo">AES Demo - Hiện đại</option>
+                </optgroup>
+                <optgroup label=" MÃ HÓA BẤT ĐỐI XỨNG (Asymmetric)">
+                    <option value="rsa">RSA - Khóa công khai/bí mật</option>
+                    <option value="diffie-hellman">Diffie-Hellman - Trao đổi khóa</option>
+                    <option value="digital-signature">Digital Signature - Chữ ký số</option>
+                </optgroup>
+                <optgroup label=" HÀM BĂM MỘT CHIỀU (Hash)">
+                    <option value="sha256">SHA-256 - Băm an toàn</option>
+                    <option value="sha512">SHA-512 - Băm mạnh lên</option>
+                    <option value="hmac">HMAC - Xác thực thông điệp</option>
+                    <option value="password-hash">Password Hash - Bcrypt</option>
+                </optgroup>
+                <optgroup label=" HYBRID - KẾT HỢP">
+                    <option value="hybrid-demo">Demo Hybrid Cryptography</option>
+                </optgroup>
             </select>
         </div>
         
@@ -40,17 +57,25 @@
             
             <div class="results-section">
                 <div class="result-group">
-                    <label>Kết quả Mã hóa:</label>
+                    <label id="encrypt-label">Kết quả Mã hóa:</label>
                     <div class="result" id="encrypt-result">Chưa có kết quả</div>
                 </div>
                 
                 <div class="result-group">
-                    <label>Kết quả Giải mã:</label>
+                    <label id="decrypt-label">Kết quả Giải mã:</label>
                     <div class="result" id="decrypt-result">Chưa có kết quả</div>
                 </div>
+                
+                <div class="result-group" id="hash-result-group" style="display: none;">
+                    <label>Kết quả Hash:</label>
+                    <div class="result" id="hash-result">Chưa có kết quả</div>
+                </div>
+                
+                <div class="result-group" id="keypair-result-group" style="display: none;">
+                    <label>Cặp khóa được tạo:</label>
+                    <div class="result" id="keypair-result">Chưa có kết quả</div>
+                </div>
             </div>
-            
-            <div class="steps-section" id="algorithm-steps"></div>
         </div>
     </div>
     
