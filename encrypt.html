@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thị Dịch Vòng</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hệ Thị Dịch Vòng</h1>
+        
+        <div class="algorithm-selector">
+            <label for="algorithm">Thuật toán:</label>
+            <select id="algorithm" onchange="updateAlgorithm()">
+                <option value="caesar">Caesar Cipher</option>
+                <option value="vigenere">Vigenère Cipher</option>
+                <option value="playfair">Playfair Cipher</option>
+                <option value="rail-fence">Rail Fence Cipher</option>
+            </select>
+        </div>
+        
+        <div class="main-section">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="input-text">Văn bản:</label>
+                    <input type="text" id="input-text" placeholder="Nhập văn bản...">
+                </div>
+                
+                <div class="input-group">
+                    <label for="input-key">Khóa:</label>
+                    <input type="text" id="input-key" placeholder="Nhập khóa..." value="3">
+                </div>
+            </div>
+            
+            <div class="button-section">
+                <button class="btn" onclick="performEncryption()">Encrypt</button>
+                <button class="btn" onclick="performDecryption()">Decrypt</button>
+            </div>
+            
+            <div class="results-section">
+                <div class="result-group">
+                    <label>Kết quả Mã hóa:</label>
+                    <div class="result" id="encrypt-result">Chưa có kết quả</div>
+                </div>
+                
+                <div class="result-group">
+                    <label>Kết quả Giải mã:</label>
+                    <div class="result" id="decrypt-result">Chưa có kết quả</div>
+                </div>
+            </div>
+            
+            <div class="steps-section" id="algorithm-steps"></div>
+        </div>
+    </div>
+    
+    <script src="thuatoan.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
