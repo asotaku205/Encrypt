@@ -1,0 +1,599 @@
+================================================================================
+HƯỚNG DẪN TOÁN HỌC CHO CÁC THUẬT TOÁN MÃ HÓA
+================================================================================
+File: CRYPTOGRAPHY_MATHEMATICAL_GUIDE.txt
+Tác giả: AI Assistant
+Ngày tạo: 26/09/2025
+Mục đích: Giải thích các thuật toán mã hóa theo góc độ toán học
+
+================================================================================
+PHẦN I: MÃ HÓA ĐỐI XỨNG (SYMMETRIC CRYPTOGRAPHY)
+================================================================================
+
+1. CAESAR CIPHER (MÃ HÓA CAESAR)
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA TOÁN HỌC:
+Caesar Cipher là phép biến đổi tuyến tính đơn giản trong không gian Z₂₆ (tập hợp các số nguyên modulo 26).
+
+CÔNG THỨC MÃ HÓA:
+E(x) = (x + k) mod 26
+
+Trong đó:
+- x: vị trí của ký tự gốc trong bảng chữ cái (A=0, B=1, ..., Z=25)
+- k: khóa (shift value), k ∈ {0, 1, 2, ..., 25}
+- E(x): vị trí của ký tự sau khi mã hóa
+
+CÔNG THỨC GIẢI MÃ:
+D(y) = (y - k) mod 26 = (y + (26-k)) mod 26
+
+Trong đó:
+- y: vị trí của ký tự đã mã hóa
+- D(y): vị trí của ký tự gốc
+
+VÍ DỤ TÍNH TOÁN:
+Mã hóa "HELLO" với khóa k = 3:
+- H (7) → (7+3) mod 26 = 10 → K
+- E (4) → (4+3) mod 26 = 7 → H  
+- L (11) → (11+3) mod 26 = 14 → O
+- L (11) → (11+3) mod 26 = 14 → O
+- O (14) → (14+3) mod 26 = 17 → R
+Kết quả: "HELLO" → "KHOOR"
+
+ĐÁNH GIÁ BẢO MẬT:
+- Không gian khóa: |K| = 26 (rất nhỏ, dễ bị tấn công brute force)
+- Entropy: H(K) = log₂(26) ≈ 4.7 bits (rất thấp)
+- Có thể bị phá bằng frequency analysis
+
+
+2. VIGENÈRE CIPHER (MÃ HÓA VIGENÈRE)
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA TOÁN HỌC:
+Vigenère là mở rộng của Caesar với khóa có độ dài m, tạo thành phép biến đổi 
+đa alphabetic trong không gian Z₂₆ᵐ.
+
+CÔNG THỨC MÃ HÓA:
+Cᵢ = (Pᵢ + Kᵢ mod m) mod 26
+
+Trong đó:
+- Pᵢ: ký tự plaintext thứ i (0 ≤ Pᵢ ≤ 25)
+- Kⱼ: ký tự khóa thứ j (0 ≤ Kⱼ ≤ 25)
+- m: độ dài khóa
+- Cᵢ: ký tự ciphertext thứ i
+
+CÔNG THỨC GIẢI MÃ:
+Pᵢ = (Cᵢ - Kᵢ mod m + 26) mod 26
+
+VÍ DỤ TÍNH TOÁN:
+Plaintext: "ATTACKATDAWN"
+Key: "LEMON" (L=11, E=4, M=12, O=14, N=13)
+
+Mã hóa:
+A(0) + L(11) = 11 mod 26 = L
+T(19) + E(4) = 23 mod 26 = X
+T(19) + M(12) = 31 mod 26 = 5 = F
+A(0) + O(14) = 14 mod 26 = O
+C(2) + N(13) = 15 mod 26 = P
+K(10) + L(11) = 21 mod 26 = V
+...
+Kết quả: "LXFOPVEFRNHR"
+
+PHÂN TÍCH BẢO MẬT:
+- Index of Coincidence (IC): Đo độ trùng lặp ký tự
+  IC = Σᵢ nᵢ(nᵢ-1) / (N(N-1))
+  Với nᵢ là số lần xuất hiện của ký tự thứ i, N là tổng số ký tự
+
+- Kasiski Test: Tìm chu kỳ khóa bằng cách phân tích khoảng cách 
+  giữa các chuỗi lặp lại trong ciphertext
+
+
+3. PLAYFAIR CIPHER
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA TOÁN HỌC:
+Playfair hoạt động trên ma trận 5×5 và xử lý theo cặp ký tự (digram).
+
+THUẬT TOÁN:
+1. Tạo ma trận 5×5 từ khóa
+2. Xử lý plaintext theo cặp
+3. Áp dụng quy tắc:
+   - Cùng hàng: dịch chuyển phải 1 vị trí
+   - Cùng cột: dịch chuyển xuống 1 vị trí  
+   - Khác hàng/cột: hoán đổi cột
+
+BIỂU DIỄN TOÁN HỌC:
+Cho digram (a,b) tại vị trí (r₁,c₁) và (r₂,c₂):
+
+Nếu r₁ = r₂: (a',b') = ((r₁, (c₁+1) mod 5), (r₂, (c₂+1) mod 5))
+Nếu c₁ = c₂: (a',b') = (((r₁+1) mod 5, c₁), ((r₂+1) mod 5, c₂))
+Ngược lại: (a',b') = ((r₁,c₂), (r₂,c₁))
+
+VÍ DỤ:
+Ma trận với khóa "MONARCHY":
+M O N A R
+C H Y B D
+E F G I K  
+L P Q S T
+U V W X Z
+
+Mã hóa "HI":
+H tại (1,1), I tại (2,3) → khác hàng/cột → HK
+
+
+4. RAIL FENCE CIPHER
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA TOÁN HỌC:
+Rail Fence sắp xếp plaintext theo mẫu zigzag với n rails (hàng).
+
+THUẬT TOÁN MÃ HÓA:
+1. Viết plaintext theo mẫu zigzag với n hàng
+2. Đọc theo từng hàng từ trên xuống
+
+CÔNG THỨC TOÁN HỌC:
+Với n rails, ký tự tại vị trí i sẽ được đặt tại rail:
+- rail = i mod (2n-2) nếu i mod (2n-2) < n
+- rail = 2n-2-(i mod (2n-2)) nếu ngược lại
+
+VÍ DỤ với n=3, plaintext="WEAREDISCOVEREDFLEEATONCE":
+Rail 0: W . . . E . . . C . . . R . . . L . . . T . . .
+Rail 1: . E . R . D . S . O . E . E . F . E . A . O . E
+Rail 2: . . A . . . I . . . V . . . D . . . E . . . N .
+
+Ciphertext: "WECRLTEERDSOEEFEAOCAIVDEN"
+
+================================================================================
+PHẦN II: MÃ HÓA BẤT ĐỐI XỨNG (ASYMMETRIC CRYPTOGRAPHY)
+================================================================================
+
+1. RSA CRYPTOSYSTEM
+--------------------------------------------------------------------------------
+
+CƠ SỞ TOÁN HỌC:
+RSA dựa trên độ khó của bài toán phân tích số nguyên lớn.
+
+THUẬT TOÁN TẠO KHÓA:
+1. Chọn hai số nguyên tố lớn p, q
+2. Tính n = p × q (modulus)
+3. Tính φ(n) = (p-1)(q-1) (Euler's totient function)
+4. Chọn e sao cho 1 < e < φ(n) và gcd(e, φ(n)) = 1
+5. Tính d ≡ e⁻¹ (mod φ(n))
+6. Khóa công khai: (n, e)
+7. Khóa riêng: (n, d)
+
+MÃ HÓA:
+c ≡ mᵉ (mod n)
+Trong đó m là plaintext (m < n)
+
+GIẢI MÃ:
+m ≡ cᵈ (mod n)
+
+CHỮ KÝ SỐ:
+Ký: s ≡ H(m)ᵈ (mod n)
+Xác minh: H(m) ≡ sᵉ (mod n)
+
+CHỨNG MINH TÍNH ĐÚNG ĐẮN:
+Theo định lý Euler: aφ(n) ≡ 1 (mod n) nếu gcd(a,n) = 1
+Vì ed ≡ 1 (mod φ(n)), nên ed = kφ(n) + 1 với k nguyên
+
+mᵉᵈ ≡ m^(kφ(n)+1) ≡ (mφ(n))ᵏ × m ≡ 1ᵏ × m ≡ m (mod n)
+
+VÍ DỤ TÍNH TOÁN:
+p = 61, q = 53
+n = 61 × 53 = 3233
+φ(n) = 60 × 52 = 3120
+Chọn e = 17 (gcd(17, 3120) = 1)
+Tính d: 17d ≡ 1 (mod 3120) → d = 2753
+
+Mã hóa m = 123:
+c = 123¹⁷ mod 3233 = 855
+
+Giải mã:
+m = 855²⁷⁵³ mod 3233 = 123
+
+ĐÁNH GIÁ BẢO MẬT:
+- Độ khó tương đương với factoring n
+- Cần n ≥ 2048 bits để đảm bảo an toàn hiện tại
+- Vulnerable với quantum computing (Shor's algorithm)
+
+
+2. DIFFIE-HELLMAN KEY EXCHANGE
+--------------------------------------------------------------------------------
+
+CƠ SỞ TOÁN HỌC:
+Dựa trên độ khó của bài toán logarithm rời rạc trong nhóm cyclic.
+
+THAM SỐ CÔNG KHAI:
+- p: số nguyên tố lớn
+- g: phần tử sinh của Z*p (generator)
+
+THUẬT TOÁN:
+Alice:
+1. Chọn khóa riêng a (1 < a < p-1)
+2. Tính khóa công khai A = gᵃ mod p
+3. Nhận B từ Bob
+4. Tính shared secret K = Bᵃ mod p
+
+Bob:
+1. Chọn khóa riêng b (1 < b < p-1)  
+2. Tính khóa công khai B = gᵇ mod p
+3. Nhận A từ Alice
+4. Tính shared secret K = Aᵇ mod p
+
+TÍNH ĐÚNG ĐẮN:
+K_Alice = Bᵃ = (gᵇ)ᵃ = gᵇᵃ mod p
+K_Bob = Aᵇ = (gᵃ)ᵇ = gᵃᵇ mod p
+Vì ab = ba, nên K_Alice = K_Bob
+
+VÍ DỤ:
+p = 23, g = 5
+Alice chọn a = 6: A = 5⁶ mod 23 = 8
+Bob chọn b = 15: B = 5¹⁵ mod 23 = 19
+Shared secret: K = 8¹⁵ mod 23 = 19⁶ mod 23 = 2
+
+BẢO MẬT:
+- Dựa trên Discrete Logarithm Problem (DLP)
+- Attacker biết p, g, A, B nhưng không thể tính được gᵃᵇ
+- Cần p ≥ 2048 bits để đảm bảo an toàn
+
+
+3. ELLIPTIC CURVE CRYPTOGRAPHY (ECC) - Cơ bản
+--------------------------------------------------------------------------------
+
+CƠ SỞ TOÁN HỌC:
+Dựa trên đường cong elliptic trên trường hữu hạn Fp.
+
+PHƯƠNG TRÌNH ĐƯỜNG CONG:
+y² ≡ x³ + ax + b (mod p)
+với 4a³ + 27b² ≢ 0 (mod p)
+
+PHÉP TOÁN ĐIỂM:
+Cộng hai điểm P(x₁,y₁) và Q(x₂,y₂):
+
+Nếu x₁ ≠ x₂:
+λ = (y₂-y₁)/(x₂-x₁) mod p
+x₃ = λ² - x₁ - x₂ mod p
+y₃ = λ(x₁-x₃) - y₁ mod p
+
+Nếu P = Q (point doubling):
+λ = (3x₁²+a)/(2y₁) mod p
+x₃ = λ² - 2x₁ mod p
+y₃ = λ(x₁-x₃) - y₁ mod p
+
+ƯU ĐIỂM:
+- Cùng mức bảo mật với key size nhỏ hơn RSA
+- 256-bit ECC ≈ 3072-bit RSA
+- Hiệu quả hơn về tính toán và băng thông
+
+================================================================================
+PHẦN III: HÀM BĂM MỘT CHIỀU (HASH FUNCTIONS)
+================================================================================
+
+1. TÍNH CHẤT TOÁN HỌC CỦA HÀM BĂM
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA:
+Hàm băm H: {0,1}* → {0,1}ⁿ là hàm ánh xạ từ chuỗi bit độ dài bất kỳ 
+về chuỗi bit độ dài cố định n.
+
+TÍNH CHẤT BẢO MẬT:
+
+1. PRE-IMAGE RESISTANCE (Tính kháng tiền ảnh):
+   Cho y, khó tìm x sao cho H(x) = y
+   Độ phức tạp: O(2ⁿ)
+
+2. SECOND PRE-IMAGE RESISTANCE (Tính kháng tiền ảnh thứ hai):
+   Cho x₁, khó tìm x₂ ≠ x₁ sao cho H(x₁) = H(x₂)
+   Độ phức tạp: O(2ⁿ)
+
+3. COLLISION RESISTANCE (Tính kháng va chạm):
+   Khó tìm x₁, x₂ với x₁ ≠ x₂ sao cho H(x₁) = H(x₂)
+   Độ phức tạp: O(2ⁿ/²) (Birthday attack)
+
+BIRTHDAY PARADOX:
+Xác suất va chạm trong hash n-bit với q queries:
+P(collision) ≈ 1 - e^(-q²/2^(n+1))
+
+Với n = 256: cần khoảng 2¹²⁸ ≈ 3.4×10³⁸ queries để có 50% khả năng va chạm
+
+
+2. SHA-256 (Simplified Mathematical Model)
+--------------------------------------------------------------------------------
+
+CẤU TRÚC MERKLE-DAMGÅRD:
+H₀ = IV (Initial Value)
+Hᵢ = f(Hᵢ₋₁, Mᵢ) với i = 1,2,...,t
+Hash final = Hₜ
+
+COMPRESSION FUNCTION f:
+Hoạt động trên 512-bit message block và 256-bit state
+Sử dụng:
+- 64 rounds của computation
+- 8 working variables (a,b,c,d,e,f,g,h)
+- Các hàm logic: Ch, Maj, Σ₀, Σ₁, σ₀, σ₁
+- 64 constants K₀, K₁, ..., K₆₃
+
+ROUND FUNCTION (đơn giản hóa):
+T₁ = h + Σ₁(e) + Ch(e,f,g) + Kᵢ + Wᵢ
+T₂ = Σ₀(a) + Maj(a,b,c)
+h = g, g = f, f = e, e = d + T₁
+d = c, c = b, b = a, a = T₁ + T₂
+
+CÁC HÀNG LOGIC:
+Ch(x,y,z) = (x ∧ y) ⊕ (¬x ∧ z)
+Maj(x,y,z) = (x ∧ y) ⊕ (x ∧ z) ⊕ (y ∧ z)
+Σ₀(x) = ROTR(x,2) ⊕ ROTR(x,13) ⊕ ROTR(x,22)
+Σ₁(x) = ROTR(x,6) ⊕ ROTR(x,11) ⊕ ROTR(x,25)
+
+
+3. HMAC (Hash-based Message Authentication Code)
+--------------------------------------------------------------------------------
+
+ĐỊNH NGHĨA TOÁN HỌC:
+HMAC(K, M) = H((K ⊕ opad) || H((K ⊕ ipad) || M))
+
+Trong đó:
+- K: khóa bí mật
+- M: message
+- H: hàm băm (SHA-256, SHA-1, etc.)
+- opad = 0x5C5C...5C (64 bytes)  
+- ipad = 0x3636...36 (64 bytes)
+- ||: phép nối chuỗi
+- ⊕: phép XOR
+
+THUẬT TOÁN:
+1. Nếu |K| > block_size: K = H(K)
+2. Nếu |K| < block_size: pad K với zeros
+3. Tính K ⊕ ipad và K ⊕ opad
+4. Hash inner: h₁ = H((K ⊕ ipad) || M)
+5. Hash outer: HMAC = H((K ⊕ opad) || h₁)
+
+BẢO MẬT:
+- Kháng chosen-message attacks
+- Secure nếu H secure và K random
+- Không cần H có tính collision-resistant cho message authentication
+
+
+4. PASSWORD HASHING - BCRYPT
+--------------------------------------------------------------------------------
+
+THUẬT TOÁN:
+bcrypt(password, salt, cost) = EksBlowfishSetup(cost, salt, password)
+
+CẤU TRÚC:
+1. Tạo salt ngẫu nhiên (128-bit)
+2. Thiết lập Blowfish với cost rounds
+3. Encrypt "OrpheanBeholderScryDoubt" 64 lần
+4. Format: $2a$rounds$salt$hash
+
+COST PARAMETER:
+- Số iterations = 2^cost
+- Mỗi tăng 1 cost → tăng gấp đôi thời gian
+- Khuyến nghị: cost ≥ 12 (4096 rounds)
+
+PHÂN TÍCH THỜI GIAN:
+T(cost) = T₀ × 2^cost
+Với cost = 12: khoảng 250ms trên CPU hiện đại
+
+KHẢ NĂNG KHÁNG TẤN CÔNG:
+- Kháng rainbow table (vì có salt)
+- Kháng brute force (vì cost cao)
+- Time-memory trade-off resistant
+
+================================================================================
+PHẦN IV: HYBRID CRYPTOGRAPHY VÀ PROTOCOLS
+================================================================================
+
+1. HYBRID ENCRYPTION SCHEME
+--------------------------------------------------------------------------------
+
+CẤU TRÚC TOÁN HỌC:
+HybridEnc(PK, M) = (RSAEnc(PK, k), AESEnc(k, M))
+
+Trong đó:
+- PK: RSA public key
+- M: plaintext message  
+- k: symmetric key được tạo ngẫu nhiên
+- RSAEnc: RSA encryption
+- AESEnc: AES encryption
+
+THUẬT TOÁN:
+1. Tạo symmetric key k ∈ᴿ {0,1}²⁵⁶
+2. Mã hóa message: C₁ = AESEnc(k, M)
+3. Mã hóa key: C₂ = RSAEnc(PK, k)
+4. Ciphertext: C = (C₁, C₂)
+
+GIẢI MÃ:
+HybridDec(SK, C) = AESDecryp(RSADec(SK, C₂), C₁)
+
+ƯU ĐIỂM:
+- Hiệu quả: O(|M|) cho symmetric, O(1) cho asymmetric
+- Bảo mật: Kết hợp ưu điểm của cả hai loại
+- Practical: Sử dụng trong TLS, PGP, etc.
+
+
+2. DIGITAL SIGNATURE SCHEMES
+--------------------------------------------------------------------------------
+
+RSA SIGNATURE:
+Sign(SK, M): s = H(M)ᵈ mod n
+Verify(PK, M, s): H(M) =? sᵉ mod n
+
+DSA (Digital Signature Algorithm):
+PARAMETERS: p (prime), q (prime divisor of p-1), g = h^((p-1)/q) mod p
+
+SIGNATURE:
+1. Chọn k ∈ᴿ {1, ..., q-1}
+2. r = (gᵏ mod p) mod q  
+3. s = k⁻¹(H(M) + xr) mod q
+4. Signature: (r, s)
+
+VERIFICATION:
+1. w = s⁻¹ mod q
+2. u₁ = H(M)w mod q
+3. u₂ = rw mod q  
+4. v = (gᵘ¹yᵘ² mod p) mod q
+5. Accept if v = r
+
+ELLIPTIC CURVE DSA (ECDSA):
+Tương tự DSA nhưng hoạt động trên elliptic curve group.
+
+
+3. KEY DERIVATION FUNCTIONS
+--------------------------------------------------------------------------------
+
+PBKDF2 (Password-Based Key Derivation Function 2):
+PBKDF2(P, S, c, dkLen) = T₁ || T₂ || ... || Tₗ
+
+Với:
+Tᵢ = F(P, S, c, i) = U₁ ⊕ U₂ ⊕ ... ⊕ Uᶜ
+U₁ = PRF(P, S || INT(i))  
+Uⱼ = PRF(P, Uⱼ₋₁) for j = 2, 3, ..., c
+
+SCRYPT:
+Sử dụng memory-hard function để kháng hardware attacks
+scrypt(P, S, N, r, p, dkLen) = PBKDF2(P, B, 1, dkLen)
+Với B được tính từ ROMix function với N iterations
+
+ARGON2:
+Winner của Password Hashing Competition 2015
+Argon2(P, S, t, m, p) với:
+- t: time parameter (iterations)
+- m: memory parameter (KB)  
+- p: parallelism parameter
+
+================================================================================
+PHẦN V: PHÂN TÍCH BẢO MẬT VÀ TẤN CÔNG
+================================================================================
+
+1. CRYPTANALYSIS METHODS
+--------------------------------------------------------------------------------
+
+FREQUENCY ANALYSIS:
+Phân tích tần suất xuất hiện của ký tự, bigram, trigram
+Áp dụng cho: substitution ciphers, mono-alphabetic ciphers
+
+Chi-squared test:
+χ² = Σᵢ (Oᵢ - Eᵢ)²/Eᵢ
+Với Oᵢ là tần suất quan sát, Eᵢ là tần suất kỳ vọng
+
+INDEX OF COINCIDENCE:
+IC = Σᵢ fᵢ(fᵢ-1) / (n(n-1))
+- Tiếng Anh: IC ≈ 0.067  
+- Random text: IC ≈ 0.038
+- Dùng để xác định key length trong Vigenère
+
+KASISKI EXAMINATION:
+Tìm repeated substrings trong ciphertext
+Khoảng cách giữa các repetitions thường là bội số của key length
+
+BIRTHDAY ATTACK:
+Tìm collision trong hash function với complexity O(2ⁿ/²)
+Dựa trên birthday paradox
+
+MEET-IN-THE-MIDDLE ATTACK:
+Áp dụng cho double encryption
+Complexity: O(2ᵏ) thay vì O(2²ᵏ)
+
+TIMING ATTACKS:
+Khai thác thời gian thực thi để suy luận secret information
+Countermeasures: constant-time implementations
+
+SIDE-CHANNEL ATTACKS:
+- Power analysis
+- Electromagnetic emanations  
+- Cache timing
+- Acoustic cryptanalysis
+
+
+2. FORMAL SECURITY DEFINITIONS
+--------------------------------------------------------------------------------
+
+SEMANTIC SECURITY (IND-CPA):
+Adversary không thể distinguish giữa encryptions của hai messages
+
+CHOSEN-CIPHERTEXT ATTACK (IND-CCA):
+Adversary có oracle access để decrypt arbitrary ciphertexts
+
+EXISTENTIAL UNFORGEABILITY (EUF-CMA):
+Adversary không thể forge valid signature cho message mới
+
+RANDOM ORACLE MODEL:
+Idealized model trong đó hash function được model như random function
+
+PROVABLE SECURITY:
+Chứng minh security của scheme dựa trên độ khó của mathematical problems
+
+================================================================================
+PHẦN VI: CÁC HẰNG SỐ VÀ THAM SỐ QUAN TRỌNG
+================================================================================
+
+SECURITY LEVELS (bits):
+- 80 bits: Không còn an toàn
+- 112 bits: Acceptable cho near-term
+- 128 bits: Good protection for foreseeable future  
+- 256 bits: Protection against quantum computers
+
+KEY SIZES EQUIVALENTS:
+Symmetric | RSA    | ECC
+----------|--------|----
+80        | 1024   | 160
+112       | 2048   | 224  
+128       | 3072   | 256
+192       | 7680   | 384
+256       | 15360  | 512
+
+RECOMMENDED PARAMETERS:
+- AES: 128, 192, 256 bits
+- RSA: ≥ 2048 bits
+- ECC: ≥ 256 bits
+- Hash: SHA-256, SHA-3
+- HMAC: với SHA-256
+- Password hashing: bcrypt cost ≥ 12
+
+ENTROPY REQUIREMENTS:
+- Cryptographic keys: Full entropy (n bits cho n-bit key)
+- Passwords: ≥ 50 bits entropy
+- Salts: ≥ 64 bits entropy
+- Nonces: Unique per encryption
+
+================================================================================
+KẾT LUẬN
+================================================================================
+
+Document này cung cấp foundation toán học cho việc hiểu và implement 
+cryptographic algorithms. Tuy nhiên, cần lưu ý:
+
+1. IMPLEMENTATION WARNINGS:
+   - Đây là educational material
+   - Production systems cần dùng well-tested libraries
+   - Side-channel attacks là mối đe dọa thực tế
+   - Constant-time implementations cần thiết
+
+2. ALGORITHM SELECTION:
+   - Sử dụng standardized algorithms (NIST approved)
+   - Tránh homebrew cryptography  
+   - Regular security updates cần thiết
+   - Key management quan trọng không kém
+
+3. FUTURE CONSIDERATIONS:
+   - Post-quantum cryptography
+   - Quantum key distribution
+   - Homomorphic encryption
+   - Zero-knowledge proofs
+
+================================================================================
+TÀI LIỆU THAM KHẢO
+================================================================================
+
+[1] Katz, J. & Lindell, Y. "Introduction to Modern Cryptography"
+[2] Menezes, A. et al. "Handbook of Applied Cryptography"  
+[3] Schneier, B. "Applied Cryptography"
+[4] NIST Special Publication 800 series
+[5] RFC documents cho cryptographic standards
+[6] OWASP Cryptographic Storage Cheat Sheet
+
+================================================================================
+HẾT DOCUMENT
+================================================================================
